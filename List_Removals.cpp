@@ -25,22 +25,6 @@ void build(int node, int l, int r, vector<int> &a){
     st[node] = st[2*node+1] + st[2*node+2] ; /* update the parent node */
 }
 
-int sum(int node, int L, int R, int l, int r){
-    // base cases : 2 
-    /* 1. Complete Overlap */  /*    L  [l,r] R    */
-    if(L <= l && r <= R) return st[node];
-
-    /* 2. No Overlap */ /* [l,r] L R [l,r] */
-    if(r < L || R < l) return 0;
-
-    // rec rln ::
-    /* Partial Overlap */
-    int mid = l + (r-l)/2;
-    int left_query = sum(2*node+1,L,R,l,mid);
-    int right_query = sum(2*node+2,L,R,mid+1,r);
-    return left_query +  right_query;
-}
-
 void update(int node, int l, int r, int indx, int val){
     // base case :: {l = r} 
     if(l == r){
@@ -58,14 +42,14 @@ void update(int node, int l, int r, int indx, int val){
 }
 
 int query(int node, int l, int r, int p){
-    // base case ::
+    // base case :: {leaf Node}
     if(l == r) return l;
 
     // rec rln ::
     int mid = l + (r-l)/2;
-    int left_sum = sum(0,l,mid,0,sz-1);
-    if(left_sum > p) return query(2*node+1,l,mid,p);
-    return query(2*node+2,mid+1,r,p);
+    int left_cnt = st[2*node+1];
+    if(left_cnt >= p) return query(2*node+1,l,mid,p);
+    return query(2*node+2,mid+1,r,p-left_cnt);
 }
 
 int main(){
@@ -78,7 +62,7 @@ int main(){
     build(0,0,n-1,a);
 
     for(int pi : p){
-        int indx = query(0,0,n-1,pi-1);
+        int indx = query(0,0,n-1,pi);
         cout << a[indx] << " ";
         update(0,0,n-1,indx,0);
     }
