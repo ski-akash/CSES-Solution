@@ -29,21 +29,34 @@ void solve(){
         } 
     }
 
-    vector<int> dp(n+1,0); dp[n] = 1;
+    vector<int> dp(n+1,INT_MIN); dp[n] = 1;
     vector<int> mx(n+1,-1);
-    for(int i = n-2; i >= 0; i--){
-        int u = topo[i]; /* # of ways from u ---> n */
-        int max_cost = 0, max_node = 
+    for(int i=n-1;i>=0;i--){
+        int u = topo[i], v = -1;
+        if(u == n) continue;
         for(auto neib : adj[u]){
-            if(dp[neib] > max_cost){
-                max_cost = dp[neib];
-                max_node = neib;
+            if(dp[neib] > dp[u]){
+                dp[u] = dp[neib];
+                v = neib;
             }
         }
-
+        if(dp[u] != INT_MIN) dp[u] += 1;
+        if(v != -1) mx[u] = v;
     }
 
-    cout << dp[1] << endl;
+    if(dp[1] == INT_MIN){
+        cout << "IMPOSSIBLE" << '\n';
+        return;
+    }
+
+    cout << dp[1] << endl; /* Max no of cities */
+
+    int node = 1;
+    while(true){
+        cout << node << " ";
+        if(node == n) break;
+        node = mx[node];
+    }
 }
 
 int main(){
